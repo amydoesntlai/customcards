@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//usr/local/**)",
+      "Read(//opt/**)",
+      "Bash(gem --version)",
+      "Bash(gem list *)",
+      "Bash(curl --version)",
+      "Bash(git --version)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}
