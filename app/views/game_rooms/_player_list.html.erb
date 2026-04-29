@@ -1,0 +1,6 @@
+<% room.active_players.each do |grp| %>
+  <span class="player-badge <%= grp.status == 'active' ? 'online' : 'offline' %>">
+    <%= grp.user.username %>
+    <strong><%= grp.score %></strong>
+  </span>
+<% end %>

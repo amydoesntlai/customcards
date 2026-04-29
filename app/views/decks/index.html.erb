@@ -1,0 +1,61 @@
+<% content_for :title, "My Decks" %>
+
+<div class="decks-page">
+  <div class="page-header">
+    <h1>Decks</h1>
+    <%= link_to "New Deck", new_deck_path, class: "btn btn--primary" %>
+  </div>
+
+  <% if @my_decks.any? %>
+    <section>
+      <h2>Your Decks</h2>
+      <div class="deck-list">
+        <% @my_decks.each do |deck| %>
+          <div class="deck-card">
+            <div class="deck-card__name"><%= deck.name %></div>
+            <div class="deck-card__meta">
+              <%= deck.cards.prompt.count %> prompts &middot; <%= deck.cards.response.count %> responses
+              <% if deck.public? %><span class="badge">Public</span><% end %>
+            </div>
+            <div class="deck-card__actions">
+              <%= link_to "View", deck_path(deck), class: "btn btn--sm" %>
+              <%= link_to "Add Card", new_deck_card_path(deck), class: "btn btn--sm btn--secondary" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @builtin_decks.any? %>
+    <section>
+      <h2>Built-in Decks</h2>
+      <div class="deck-list">
+        <% @builtin_decks.each do |deck| %>
+          <div class="deck-card deck-card--builtin">
+            <div class="deck-card__name"><%= deck.name %></div>
+            <div class="deck-card__meta">
+              <%= deck.cards.prompt.count %> prompts &middot; <%= deck.cards.response.count %> responses
+            </div>
+            <%= link_to "View", deck_path(deck), class: "btn btn--sm" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @public_decks.any? %>
+    <section>
+      <h2>Community Decks</h2>
+      <div class="deck-list">
+        <% @public_decks.each do |deck| %>
+          <div class="deck-card">
+            <div class="deck-card__name"><%= deck.name %></div>
+            <div class="deck-card__meta">by <%= deck.owner.username %></div>
+            <%= link_to "View", deck_path(deck), class: "btn btn--sm" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

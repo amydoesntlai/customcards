@@ -1,0 +1,40 @@
+<% content_for :title, "Add Card to #{@deck.name}" %>
+
+<div class="form-page">
+  <h1>Add Card to <em><%= @deck.name %></em></h1>
+
+  <%= form_with model: [ @deck, @card ] do |f| %>
+    <% if @card.errors.any? %>
+      <div class="flash flash--alert"><%= @card.errors.full_messages.first %></div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :card_type, "Card type" %>
+      <%= f.select :card_type,
+            [ ["Prompt (the question)", "prompt"], ["Response (the answer)", "response"] ],
+            {},
+            class: "input" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :content, "Card text" %>
+      <%= f.text_area :content,
+            rows: 3,
+            class: "input",
+            placeholder: "Use ___ for blanks in prompts",
+            maxlength: 280 %>
+    </div>
+
+    <div class="field">
+      <%= f.label :pick_count, "Cards to pick (prompts only)" %>
+      <%= f.select :pick_count, 1..3, {}, class: "input" %>
+    </div>
+
+    <%= f.submit "Add Card", class: "btn btn--primary" %>
+    <%= link_to "Cancel", deck_path(@deck), class: "btn btn--ghost" %>
+  <% end %>
+
+  <% if @deck.public? %>
+    <p class="hint">Cards added to public decks go to a moderation queue before appearing in games.</p>
+  <% end %>
+</div>

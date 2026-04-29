@@ -1,0 +1,23 @@
+<% content_for :title, "New Deck" %>
+
+<div class="form-page">
+  <h1>New Deck</h1>
+
+  <%= form_with model: @deck do |f| %>
+    <% if @deck.errors.any? %>
+      <div class="flash flash--alert"><%= @deck.errors.full_messages.first %></div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :name, "Deck name" %>
+      <%= f.text_field :name, class: "input", autofocus: true %>
+    </div>
+
+    <div class="field field--inline">
+      <%= f.check_box :public %>
+      <%= f.label :public, "Make this deck public (cards go to moderation queue)" %>
+    </div>
+
+    <%= f.submit "Create Deck", class: "btn btn--primary" %>
+  <% end %>
+</div>

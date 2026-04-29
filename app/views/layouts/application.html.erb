@@ -24,6 +24,28 @@
   </head>
 
   <body>
-    <%= yield %>
+    <nav class="navbar">
+      <a href="<%= root_path %>" class="nav-brand">Custom Cards</a>
+      <div class="nav-actions">
+        <% if logged_in? %>
+          <span class="nav-user"><%= current_user.username %></span>
+          <%= link_to "My Decks", decks_path, class: "nav-link" %>
+          <%= button_to "Sign out", session_path, method: :delete, class: "nav-link nav-link--subtle" %>
+        <% else %>
+          <%= link_to "Sign in", new_session_path, class: "nav-link" %>
+        <% end %>
+      </div>
+    </nav>
+
+    <main class="container">
+      <% if flash[:notice] %>
+        <div class="flash flash--notice"><%= flash[:notice] %></div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div class="flash flash--alert"><%= flash[:alert] %></div>
+      <% end %>
+
+      <%= yield %>
+    </main>
   </body>
 </html>

@@ -1,0 +1,13 @@
+<% players = room.active_players.sort_by { |g| -g.score } %>
+<% if players.any? && room.playing? %>
+  <div class="scoreboard">
+    <h4>Scores</h4>
+    <% players.each_with_index do |grp, i| %>
+      <div class="score-row <%= i.zero? ? 'score-row--leading' : '' %>">
+        <span class="score-rank">#<%= i + 1 %></span>
+        <span class="score-name"><%= grp.user.username %></span>
+        <span class="score-points"><%= grp.score %> / <%= room.rounds_to_win %></span>
+      </div>
+    <% end %>
+  </div>
+<% end %>

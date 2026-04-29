@@ -1,0 +1,36 @@
+<% content_for :title, @deck.name %>
+
+<div class="deck-show">
+  <div class="page-header">
+    <h1><%= @deck.name %></h1>
+    <% if @deck.owner == current_user %>
+      <%= link_to "Add Card", new_deck_card_path(@deck), class: "btn btn--primary" %>
+    <% end %>
+  </div>
+
+  <div class="card-columns">
+    <div class="card-column">
+      <h3>Prompts (<%= @cards.prompt.count %>)</h3>
+      <% @cards.prompt.each do |card| %>
+        <div class="card card--prompt card--sm <%= 'card--pending' if card.status == 'pending' %>">
+          <%= card.content %>
+          <% if card.status == "pending" %>
+            <span class="badge badge--pending">Pending review</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="card-column">
+      <h3>Responses (<%= @cards.response.count %>)</h3>
+      <% @cards.response.each do |card| %>
+        <div class="card card--response card--sm <%= 'card--pending' if card.status == 'pending' %>">
+          <%= card.content %>
+          <% if card.status == "pending" %>
+            <span class="badge badge--pending">Pending review</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<% if is_judge %>
+  <div class="judge-waiting">
+    <p>You are the judge this round.</p>
+    <p class="hint">Waiting for players to submit their cards...</p>
+  </div>
+<% elsif round.status == "complete" %>
+  <div class="round-waiting">
+    <p class="hint">Round complete — next round starting soon...</p>
+  </div>
+<% else %>
+  <div class="hand"
+       data-controller="game"
+       data-action="submit->game#submit">
+    <input type="hidden" data-game-target="pickCount" value="<%= round.prompt_card.pick_count %>">
+
+    <p class="hand-instruction">
+      <% if round.prompt_card.pick_count > 1 %>
+        Pick <strong><%= round.prompt_card.pick_count %></strong> cards.
+      <% else %>
+        Pick your best card.
+      <% end %>
+    </p>
+
+    <div class="hand-cards">
+      <% cards.each do |card| %>
+        <div class="card card--response"
+             data-card-id="<%= card.id %>"
+             data-action="click->game#toggleCard"
+             data-game-target="card">
+          <%= card.content %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="hand-footer">
+      <span data-game-target="counter" class="selection-counter">0 / <%= round.prompt_card.pick_count %> selected</span>
+      <form action="<%= game_room_submissions_path(room.code) %>">
+        <button type="button"
+                data-game-target="submitBtn"
+                data-action="click->game#submit"
+                class="btn btn--primary"
+                disabled>
+          Submit
+        </button>
+      </form>
+    </div>
+  </div>
+<% end %>

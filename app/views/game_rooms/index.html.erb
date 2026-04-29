@@ -1,0 +1,44 @@
+<% content_for :title, "Custom Cards" %>
+
+<div class="home">
+  <section class="hero">
+    <h1>Custom Cards</h1>
+    <p class="hero-sub">A party card game — your prompts, your rules.</p>
+
+    <div class="hero-actions">
+      <%= link_to "Create Room", new_game_room_path, class: "btn btn--primary btn--lg" %>
+    </div>
+
+    <div class="join-form">
+      <p>Have a code?</p>
+      <%= form_with url: "#", method: :get, data: { controller: "join-form", action: "submit->join-form#redirect" } do |f| %>
+        <div class="join-row">
+          <%= f.text_field :code,
+                placeholder: "ABC123",
+                maxlength: 6,
+                autocomplete: "off",
+                class: "input input--code",
+                data: { "join-form-target": "code" } %>
+          <%= f.submit "Join →", class: "btn btn--secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <% if logged_in? && @my_rooms.any? %>
+    <section class="recent-rooms">
+      <h2>Your Recent Rooms</h2>
+      <div class="room-list">
+        <% @my_rooms.each do |room| %>
+          <div class="room-card room-card--<%= room.status %>">
+            <div class="room-card__code"><%= room.code %></div>
+            <div class="room-card__meta">
+              <%= room.players.count %> players &middot; <%= room.status %>
+            </div>
+            <%= link_to "View", game_room_path(room.code), class: "btn btn--sm" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

@@ -1,0 +1,25 @@
+<% content_for :title, "New Room" %>
+
+<div class="form-page">
+  <h1>Create a Room</h1>
+
+  <%= form_with model: @room, url: game_rooms_path do |f| %>
+    <% if @room.errors.any? %>
+      <div class="flash flash--alert">
+        <%= @room.errors.full_messages.first %>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :rounds_to_win, "Rounds to win" %>
+      <%= f.number_field :rounds_to_win, min: 1, max: 20, class: "input" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :hand_size, "Cards in hand" %>
+      <%= f.number_field :hand_size, min: 3, max: 10, class: "input" %>
+    </div>
+
+    <%= f.submit "Create Room", class: "btn btn--primary" %>
+  <% end %>
+</div>

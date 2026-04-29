@@ -1,0 +1,118 @@
+<% content_for :title, "Room #{@room.code}" %>
+
+<div class="game-room"
+     data-controller="room-cable"
+     data-room-cable-room-code-value="<%= @room.code %>"
+     data-room-cable-player-hand-id-value="<%= @my_grp&.id %>">
+
+  <%# Turbo stream for the private per-player hand updates %>
+  <% if @my_grp %>
+    <%= turbo_stream_from "player_hand:#{@my_grp.id}" %>
+  <% end %>
+  <%= turbo_stream_from @room.broadcast_stream %>
+
+  <div class="game-header">
+    <div class="game-header__code">
+      Room: <strong><%= @room.code %></strong>
+      <button class="btn btn--sm btn--ghost" onclick="navigator.clipboard.writeText('<%= request.base_url + game_room_path(@room.code) %>')" title="Copy link">Copy link</button>
+    </div>
+    <div id="round-header" class="game-header__round">
+      <% if @round %>
+        <span class="round-number">Round <%= @round.number %></span>
+        <span class="judge-label">Judge: <strong><%= @round.judge.username %></strong></span>
+      <% end %>
+    </div>
+  </div>
+
+  <div id="system-banner" class="system-banner" hidden></div>
+  <div id="round-result" class="round-result" hidden></div>
+  <div id="game-over"    class="game-over"    hidden></div>
+
+  <div class="game-body">
+    <aside class="sidebar">
+      <h3>Players</h3>
+      <div id="player-status" class="player-status">
+        <%= render "game_rooms/player_list", room: @room %>
+      </div>
+
+      <%= turbo_frame_tag "scoreboard" do %>
+        <%= render "game_rooms/scoreboard", room: @room %>
+      <% end %>
+
+      <% if @room.waiting? && @room.owner == current_user %>
+        <div class="start-section">
+          <% if @room.active_players.count < 3 %>
+            <p class="hint">Need at least 3 players to start.</p>
+          <% end %>
+          <%= button_to "Start Game",
+                start_game_room_path(@room.code),
+                method: :post,
+                class: "btn btn--primary btn--full",
+                disabled: @room.active_players.count < 3 %>
+        </div>
+      <% elsif @room.waiting? %>
+        <p class="hint">Waiting for <strong><%= @room.owner.username %></strong> to start...</p>
+      <% end %>
+    </aside>
+
+    <div class="main-panel">
+      <% if @room.waiting? %>
+        <div class="lobby-waiting">
+          <h2>Lobby</h2>
+          <p>Share the code <strong class="code"><%= @room.code %></strong> with friends.</p>
+          <p id="submit-progress" class="hint"><%= @room.active_players.count %> player(s) in room</p>
+        </div>
+
+      <% elsif @room.playing? && @round %>
+        <div class="prompt-area">
+          <div class="prompt-card">
+            <%= @round.prompt_card.content %>
+          </div>
+          <div id="submit-progress" class="submit-progress">
+            <%= @round.submissions.count %> / <%= @round.non_judge_players.count %> submitted
+          </div>
+        </div>
+
+        <div id="hand" class="hand-area">
+          <% if @my_grp %>
+            <% if @round.judge == current_user %>
+              <% if @round.status == "judging" %>
+                <%= render "game/judging_panel",
+                      round: @round,
+                      submissions: @round.submissions.includes(:cards).to_a.shuffle,
+                      room: @room %>
+              <% else %>
+                <div class="judge-waiting">
+                  <p>You are the judge this round.</p>
+                  <p class="hint">Waiting for players to submit their cards...</p>
+                </div>
+              <% end %>
+            <% else %>
+              <%= render "game/hand",
+                    cards: @my_grp.unplayed_cards,
+                    round: @round,
+                    is_judge: false,
+                    room: @room %>
+            <% end %>
+          <% end %>
+        </div>
+
+      <% elsif @room.finished? %>
+        <div class="game-finished">
+          <h2>Game Over!</h2>
+          <% winner = @room.winner_player %>
+          <% if winner %>
+            <p><strong><%= winner.user.username %></strong> wins with <%= winner.score %> points!</p>
+          <% end %>
+          <%= link_to "New Game", new_game_room_path, class: "btn btn--primary" %>
+        </div>
+      <% end %>
+
+      <% unless @membership %>
+        <% if @room.waiting? %>
+          <%= button_to "Join Game", join_game_room_path(@room.code), method: :post, class: "btn btn--primary" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
