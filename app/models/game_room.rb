@@ -7,7 +7,7 @@ class GameRoom < ApplicationRecord
 
   STATUSES = %w[waiting playing finished].freeze
 
-  before_create :generate_code
+  before_validation :generate_code, on: :create
 
   validates :code, presence: true, uniqueness: true, length: { is: 6 }
   validates :status, inclusion: { in: STATUSES }

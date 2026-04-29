@@ -5,7 +5,7 @@ class User < ApplicationRecord
   has_many :created_cards, class_name: "Card", foreign_key: :creator_id, dependent: :nullify
   has_many :owned_decks, class_name: "Deck", foreign_key: :owner_id, dependent: :nullify
 
-  before_create :generate_session_token
+  before_validation :generate_session_token, on: :create
 
   validates :username, presence: true,
                        length: { in: 2..20 },

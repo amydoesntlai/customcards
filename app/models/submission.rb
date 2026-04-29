@@ -8,8 +8,8 @@ class Submission < ApplicationRecord
 
   def mark_winner!
     round.with_lock do
-      raise ActiveRecord::RecordInvalid, "Round not in judging state" unless round.status == "judging"
-      raise ActiveRecord::RecordInvalid, "Round already has a winner" if round.submissions.exists?(winner: true)
+      raise "Round not in judging state" unless round.status == "judging"
+      raise "Round already has a winner"  if round.submissions.exists?(winner: true)
 
       transaction do
         update!(winner: true)
