@@ -8,7 +8,9 @@
       "Bash(curl --version)",
       "Bash(git --version)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(export PATH=\"$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH\")",
+      "Bash(bin/rails db:seed)"
     ]
   }
 }
