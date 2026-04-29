@@ -4,9 +4,6 @@ deck = Deck.find_or_create_by!(name: "Base Deck") do |d|
   d.public = true
 end
 
-# Wipe existing cards so we can replace them cleanly
-deck.cards.delete_all
-
 PROMPTS = [
   "Why did the sprint end with zero points delivered?",
   "What's the real reason the build is broken?",
@@ -126,17 +123,19 @@ RESPONSES = [
   "Chronic main character syndrome in the architecture diagram",
 ].freeze
 
-prompt_rows = PROMPTS.map { |c|
+existing = deck.cards.pluck(:content)
+
+prompt_rows = PROMPTS.reject { |c| existing.include?(c) }.map { |c|
   { content: c, card_type: "prompt", deck_id: deck.id, status: "approved", pick_count: 1,
     created_at: Time.current, updated_at: Time.current }
 }
-response_rows = RESPONSES.map { |c|
+response_rows = RESPONSES.reject { |c| existing.include?(c) }.map { |c|
   { content: c, card_type: "response", deck_id: deck.id, status: "approved", pick_count: 1,
     created_at: Time.current, updated_at: Time.current }
 }
 
-Card.insert_all!(prompt_rows)
-Card.insert_all!(response_rows)
+Card.insert_all!(prompt_rows)   if prompt_rows.any?
+Card.insert_all!(response_rows) if response_rows.any?
 
 puts "  #{deck.cards.prompt.count} prompts, #{deck.cards.response.count} responses"
 puts "Done."
