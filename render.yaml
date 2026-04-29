@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: customcards
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_MASTER_KEY
+        sync: false          # you'll paste this in the Render dashboard
+      - key: RAILS_LOG_LEVEL
+        value: info
+      - key: SOLID_QUEUE_IN_PUMA
+        value: "true"
+    disk:
+      name: customcards-storage
+      mountPath: /rails/storage
+      sizeGB: 1
