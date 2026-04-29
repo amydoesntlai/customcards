@@ -1,0 +1,27 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <h1>Custom Cards</h1>
+    <p class="subtitle">A party card game with your own rules</p>
+
+    <% if flash[:alert] %>
+      <div class="flash flash--alert"><%= flash[:alert] %></div>
+    <% end %>
+    <% if @error %>
+      <div class="flash flash--alert"><%= @error %></div>
+    <% end %>
+
+    <%= form_with url: sessions_path, method: :post do |f| %>
+      <div class="field">
+        <%= f.label :username, "Choose a username" %>
+        <%= f.text_field :username,
+              placeholder: "e.g. ChaosGremlin",
+              autofocus: true,
+              maxlength: 20,
+              autocomplete: "off",
+              pattern: "[a-zA-Z0-9_]+",
+              title: "Letters, numbers, and underscores only" %>
+      </div>
+      <%= f.submit "Enter →" %>
+    <% end %>
+  </div>
+</div>

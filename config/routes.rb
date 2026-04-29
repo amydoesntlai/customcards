@@ -1,14 +1,32 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # Auth
+  resource :session, only: [ :new, :create, :destroy ]
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Lobby + game rooms
+  resources :game_rooms, param: :code, only: [ :new, :create, :show ] do
+    member do
+      post :join
+      post :start
+    end
+  end
+
+  # Custom cards
+  resources :decks, only: [ :index, :new, :create, :show ] do
+    resources :cards, only: [ :new, :create ], shallow: true
+  end
+  resources :cards, only: [] do
+    member do
+      patch :approve
+      patch :reject
+    end
+  end
+
+  # Game actions (nested under room code for clarity)
+  post "game_rooms/:code/rounds",             to: "rounds#create",        as: :game_room_rounds
+  post "game_rooms/:code/submissions",        to: "submissions#create",   as: :game_room_submissions
+  patch "game_rooms/:code/submissions/:id/pick_winner", to: "submissions#pick_winner", as: :pick_winner
+
+  root "game_rooms#index"
 end
