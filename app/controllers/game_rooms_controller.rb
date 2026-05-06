@@ -79,7 +79,7 @@ class GameRoomsController < ApplicationController
   end
 
   def broadcast_player_list(room)
-    Turbo::StreamsChannel.broadcast_replace_to(
+    Turbo::StreamsChannel.broadcast_update_to(
       room.broadcast_stream,
       target: "player-status",
       partial: "game_rooms/player_list",

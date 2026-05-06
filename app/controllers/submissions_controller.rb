@@ -67,7 +67,7 @@ class SubmissionsController < ApplicationController
       scores: scores
     })
 
-    Turbo::StreamsChannel.broadcast_replace_to(
+    Turbo::StreamsChannel.broadcast_update_to(
       room.broadcast_stream,
       target: "scoreboard",
       partial: "game_rooms/scoreboard",
@@ -91,14 +91,14 @@ class SubmissionsController < ApplicationController
 
     room.active_players.each do |grp|
       if grp.user_id == round.judge_id
-        Turbo::StreamsChannel.broadcast_replace_to(
+        Turbo::StreamsChannel.broadcast_update_to(
           "player_hand:#{grp.id}",
           target: "hand",
           partial: "game/judging_panel",
           locals: { round: round, submissions: subs, room: room }
         )
       else
-        Turbo::StreamsChannel.broadcast_replace_to(
+        Turbo::StreamsChannel.broadcast_update_to(
           "player_hand:#{grp.id}",
           target: "hand",
           partial: "game/hand",

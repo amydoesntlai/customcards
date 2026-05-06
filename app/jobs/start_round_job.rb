@@ -48,6 +48,16 @@ class StartRoundJob < ApplicationJob
   end
 
   def deal_cards(room, judge)
+    # Cards currently in any player's unplayed hand — cannot be dealt again.
+    held_ids = PlayerHand.joins(:game_room_player)
+                         .where(game_room_players: { game_room_id: room.id }, played: false)
+                         .pluck(:card_id)
+
+    # Cards already played/discarded this game — draw from these only after fresh cards run out.
+    discarded_ids = PlayerHand.joins(:game_room_player)
+                               .where(game_room_players: { game_room_id: room.id }, played: true)
+                               .pluck(:card_id).uniq - held_ids
+
     room.active_players.each do |grp|
       next if grp.user_id == judge.id
 
@@ -55,17 +65,38 @@ class StartRoundJob < ApplicationJob
       needed = room.hand_size - current_count
       next if needed <= 0
 
-      held_ids = grp.player_hands.pluck(:card_id)
+      # Cards ever held by this player — unique index prevents re-dealing them.
+      ever_held_by_player = grp.player_hands.pluck(:card_id)
+
+      # Draw fresh (never-discarded, not currently held by anyone) cards first.
       new_cards = Card.response.approved
-                      .where.not(id: held_ids)
+                      .where.not(id: held_ids | discarded_ids | ever_held_by_player)
                       .order(Arel.sql("RANDOM()"))
                       .limit(needed)
+                      .to_a
+
+      # Supplement with recycled discards if fresh cards ran out.
+      if new_cards.length < needed
+        still_needed = needed - new_cards.length
+        recycled = Card.response.approved
+                       .where(id: discarded_ids - new_cards.map(&:id) - ever_held_by_player)
+                       .order(Arel.sql("RANDOM()"))
+                       .limit(still_needed)
+                       .to_a
+        new_cards += recycled
+      end
+
+      next if new_cards.empty?
 
       rows = new_cards.map { |c|
         { game_room_player_id: grp.id, card_id: c.id, played: false,
           created_at: Time.current, updated_at: Time.current }
       }
-      PlayerHand.insert_all!(rows) if rows.any?
+      PlayerHand.insert_all!(rows)
+
+      new_card_ids = new_cards.map(&:id)
+      held_ids     = held_ids | new_card_ids
+      discarded_ids = discarded_ids - new_card_ids
     end
   end
 
@@ -91,7 +122,7 @@ class StartRoundJob < ApplicationJob
   def broadcast_hands(room, round)
     room.active_players.each do |grp|
       cards = grp.unplayed_cards
-      Turbo::StreamsChannel.broadcast_replace_to(
+      Turbo::StreamsChannel.broadcast_update_to(
         "player_hand:#{grp.id}",
         target: "hand",
         partial: "game/hand",
