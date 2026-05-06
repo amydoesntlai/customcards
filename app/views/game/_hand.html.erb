@@ -3,6 +3,10 @@
     <p>You are the judge this round.</p>
     <p class="hint">Waiting for players to submit their cards...</p>
   </div>
+<% elsif round.status == "judging" %>
+  <div class="judge-waiting">
+    <p class="hint">All cards submitted — waiting for the judge to pick a winner...</p>
+  </div>
 <% elsif round.status == "complete" %>
   <div class="round-waiting">
     <p class="hint">Round complete — next round starting soon...</p>

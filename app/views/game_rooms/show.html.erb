@@ -39,20 +39,22 @@
         <%= render "game_rooms/scoreboard", room: @room %>
       <% end %>
 
-      <% if @room.waiting? && @room.owner == current_user %>
-        <div class="start-section">
-          <% if @room.active_players.count < 3 %>
-            <p class="hint">Need at least 3 players to start.</p>
-          <% end %>
-          <%= button_to "Start Game",
-                start_game_room_path(@room.code),
-                method: :post,
-                class: "btn btn--primary btn--full",
-                disabled: @room.active_players.count < 3 %>
-        </div>
-      <% elsif @room.waiting? %>
-        <p class="hint">Waiting for <strong><%= @room.owner.username %></strong> to start...</p>
-      <% end %>
+      <div id="start-section">
+        <% if @room.waiting? && @room.owner == current_user %>
+          <div class="start-section">
+            <% if @room.active_players.count < 3 %>
+              <p class="hint">Need at least 3 players to start.</p>
+            <% end %>
+            <%= button_to "Start Game",
+                  start_game_room_path(@room.code),
+                  method: :post,
+                  class: "btn btn--primary btn--full",
+                  disabled: @room.active_players.count < 3 %>
+          </div>
+        <% elsif @room.waiting? %>
+          <p class="hint">Waiting for <strong><%= @room.owner.username %></strong> to start...</p>
+        <% end %>
+      </div>
     </aside>
 
     <div class="main-panel">
@@ -60,18 +62,11 @@
         <div class="lobby-waiting">
           <h2>Lobby</h2>
           <p>Share the code <strong class="code"><%= @room.code %></strong> with friends.</p>
-          <p id="submit-progress" class="hint"><%= @room.active_players.count %> player(s) in room</p>
+          <p id="lobby-player-count" class="hint"><%= @room.active_players.count %> player(s) in room</p>
         </div>
 
       <% elsif @room.playing? && @round %>
-        <div class="prompt-area">
-          <div class="prompt-card">
-            <%= @round.prompt_card.content %>
-          </div>
-          <div id="submit-progress" class="submit-progress">
-            <%= @round.submissions.count %> / <%= @round.non_judge_players.count %> submitted
-          </div>
-        </div>
+        <%= render "game/prompt_area", round: @round %>
 
         <div id="hand" class="hand-area">
           <% if @my_grp %>

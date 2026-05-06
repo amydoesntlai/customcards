@@ -60,7 +60,7 @@ class GameRoomsController < ApplicationController
       @room.update!(status: "playing")
     end
 
-    StartRoundJob.perform_later(@room.id)
+    StartRoundJob.perform_now(@room.id)
     redirect_to game_room_path(@room.code)
   end
 
@@ -81,9 +81,15 @@ class GameRoomsController < ApplicationController
   def broadcast_player_list(room)
     Turbo::StreamsChannel.broadcast_replace_to(
       room.broadcast_stream,
-      target: "player-list",
+      target: "player-status",
       partial: "game_rooms/player_list",
       locals: { room: room }
+    )
+
+    Turbo::StreamsChannel.broadcast_update_to(
+      room.broadcast_stream,
+      target: "lobby-player-count",
+      html: "#{room.active_players.count} player(s) in room"
     )
   end
 end

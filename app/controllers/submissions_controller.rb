@@ -89,15 +89,22 @@ class SubmissionsController < ApplicationController
       }
     })
 
-    # Update judge's UI with the judging panel
-    judge_grp = room.active_players.find { |grp| grp.user_id == round.judge_id }
-    return unless judge_grp
-
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "player_hand:#{judge_grp.id}",
-      target: "hand",
-      partial: "game/judging_panel",
-      locals: { round: round, submissions: subs, room: room }
-    )
+    room.active_players.each do |grp|
+      if grp.user_id == round.judge_id
+        Turbo::StreamsChannel.broadcast_replace_to(
+          "player_hand:#{grp.id}",
+          target: "hand",
+          partial: "game/judging_panel",
+          locals: { round: round, submissions: subs, room: room }
+        )
+      else
+        Turbo::StreamsChannel.broadcast_replace_to(
+          "player_hand:#{grp.id}",
+          target: "hand",
+          partial: "game/hand",
+          locals: { cards: grp.unplayed_cards, round: round, is_judge: false, room: room }
+        )
+      end
+    end
   end
 end

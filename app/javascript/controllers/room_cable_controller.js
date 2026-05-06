@@ -54,6 +54,9 @@ export default class extends Controller {
     el.innerHTML = data.players.map(p =>
       `<span class="player-badge ${p.online ? "online" : "offline"}">${p.username} <strong>${p.score}</strong></span>`
     ).join("")
+
+    const startBtn = document.querySelector("#start-section button[type='submit']")
+    if (startBtn) startBtn.disabled = data.players.length < 3
   }
 
   updateSubmitProgress(data) {

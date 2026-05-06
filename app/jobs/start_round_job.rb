@@ -79,6 +79,13 @@ class StartRoundJob < ApplicationJob
       submitted_count: 0,
       needed_count: round.non_judge_players.count
     })
+
+    Turbo::StreamsChannel.broadcast_replace_to(
+      room.broadcast_stream,
+      target: "prompt-area",
+      partial: "game/prompt_area",
+      locals: { round: round }
+    )
   end
 
   def broadcast_hands(room, round)
