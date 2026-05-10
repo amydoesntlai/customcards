@@ -1,19 +1,26 @@
 <div class="judging-panel" data-controller="game">
   <h3>Choose the winner</h3>
-  <p class="hint">Tap a submission to award the point.</p>
+  <p class="hint">Tap a submission to select it, then confirm.</p>
 
   <div class="submissions-grid">
     <% submissions.each do |submission| %>
-      <form action="<%= pick_winner_path(room.code, submission.id) %>"
-            data-action="submit->game#pickWinner"
-            class="submission-form">
-        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-        <button type="submit" class="submission-card">
-          <% submission.cards.each do |card| %>
-            <span class="submission-card__text"><%= card.content %></span>
-          <% end %>
-        </button>
-      </form>
+      <div class="submission-card"
+           data-game-target="submissionCard"
+           data-action="click->game#selectSubmission"
+           data-pick-url="<%= pick_winner_path(room.code, submission.id) %>">
+        <% submission.cards.order("submission_cards.position").each do |card| %>
+          <span class="submission-card__text"><%= card.content %></span>
+        <% end %>
+      </div>
     <% end %>
+  </div>
+
+  <div class="judging-footer">
+    <button class="btn btn--primary"
+            data-game-target="confirmBtn"
+            data-action="click->game#pickWinner"
+            disabled>
+      Confirm winner
+    </button>
   </div>
 </div>

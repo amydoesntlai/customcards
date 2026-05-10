@@ -314,7 +314,6 @@ body {
   gap: 0.75rem;
 }
 
-.submission-form { all: unset; }
 
 .submission-card {
   background: var(--response-bg);
@@ -333,8 +332,10 @@ body {
   transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
   box-shadow: var(--shadow);
 }
-.submission-card:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 8px 28px rgba(124,106,247,0.4); }
-.submission-card:disabled { opacity: 0.5; cursor: default; }
+.submission-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 8px 28px rgba(124,106,247,0.4); }
+.submission-card--selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,106,247,0.4); }
+
+.judging-footer { margin-top: 1rem; }
 
 /* Notifications */
 .system-banner, .round-result, .game-over {

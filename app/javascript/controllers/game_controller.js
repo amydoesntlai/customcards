@@ -1,11 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = [ "card", "submitBtn", "counter", "pickCount" ]
+  static targets = [ "card", "submitBtn", "counter", "pickCount", "submissionCard", "confirmBtn" ]
 
   connect() {
     this.selected = new Set()
-    this.pickCount = parseInt(this.pickCountTarget?.value || "1")
+    this.pickCount = this.hasPickCountTarget ? parseInt(this.pickCountTarget.value) : 1
     this.updateUI()
   }
 
@@ -52,14 +52,22 @@ export default class extends Controller {
     })
   }
 
+  selectSubmission(event) {
+    this.submissionCardTargets.forEach(c => c.classList.remove("submission-card--selected"))
+    event.currentTarget.classList.add("submission-card--selected")
+    this.selectedUrl = event.currentTarget.dataset.pickUrl
+    this.confirmBtnTarget.disabled = false
+  }
+
   pickWinner(event) {
     event.preventDefault()
-    const form = event.currentTarget
-    fetch(form.action, {
+    if (!this.selectedUrl) return
+    this.confirmBtnTarget.disabled = true
+    this.submissionCardTargets.forEach(c => c.style.pointerEvents = "none")
+    fetch(this.selectedUrl, {
       method: "PATCH",
       headers: { "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content }
     })
-    event.currentTarget.querySelectorAll("button").forEach(b => b.disabled = true)
   }
 
   updateUI() {
