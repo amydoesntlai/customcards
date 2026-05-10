@@ -19,6 +19,11 @@ export default class extends Controller {
     } else if (this.selected.size < this.pickCount) {
       this.selected.add(id)
       el.classList.add("card--selected")
+    } else if (this.pickCount === 1) {
+      this.cardTargets.forEach(c => c.classList.remove("card--selected"))
+      this.selected.clear()
+      this.selected.add(id)
+      el.classList.add("card--selected")
     }
 
     this.updateUI()
