@@ -123,10 +123,15 @@ RESPONSES = [
   "Chronic main character syndrome in the architecture diagram",
 ].freeze
 
+PROMPT_PICK_COUNTS = {
+  "Coming this quarter: ___ vs. ___." => 2,
+}.freeze
+
 existing = deck.cards.pluck(:content)
 
 prompt_rows = PROMPTS.reject { |c| existing.include?(c) }.map { |c|
-  { content: c, card_type: "prompt", deck_id: deck.id, status: "approved", pick_count: 1,
+  { content: c, card_type: "prompt", deck_id: deck.id, status: "approved",
+    pick_count: PROMPT_PICK_COUNTS.fetch(c, 1),
     created_at: Time.current, updated_at: Time.current }
 }
 response_rows = RESPONSES.reject { |c| existing.include?(c) }.map { |c|
