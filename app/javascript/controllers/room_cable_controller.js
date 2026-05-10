@@ -33,8 +33,6 @@ export default class extends Controller {
       case "round_started":
         if (document.getElementById("lobby-player-count")) {
           Turbo.visit(window.location.href)
-        } else {
-          this.updateRoundHeader(data)
         }
         break
       case "judging_started":
@@ -77,15 +75,6 @@ export default class extends Controller {
     if (data.submitted_count >= data.needed_count) {
       el.textContent = "All submitted! Waiting for judge..."
     }
-  }
-
-  updateRoundHeader(data) {
-    const el = document.getElementById("round-header")
-    if (!el) return
-    el.innerHTML = `
-      <span class="round-number">Round ${data.number}</span>
-      <span class="judge-label">Judge: <strong>${data.judge}</strong></span>
-    `
   }
 
   showRoundResult(data) {

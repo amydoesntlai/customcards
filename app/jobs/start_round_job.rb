@@ -111,6 +111,13 @@ class StartRoundJob < ApplicationJob
       needed_count: round.non_judge_players.count
     })
 
+    Turbo::StreamsChannel.broadcast_update_to(
+      room.broadcast_stream,
+      target: "round-header",
+      html: "<span class=\"round-number\">Round #{round.number}</span>" \
+            "<span class=\"judge-label\">Judge: <strong>#{ERB::Util.html_escape(round.judge.username)}</strong></span>"
+    )
+
     Turbo::StreamsChannel.broadcast_replace_to(
       room.broadcast_stream,
       target: "prompt-area",
