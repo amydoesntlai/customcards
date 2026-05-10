@@ -27,22 +27,10 @@ export default class extends Controller {
   submit(event) {
     event.preventDefault()
 
-    const form = event.currentTarget
     const ids = [...this.selected]
-    const input = form.querySelector("[name='card_ids[]']") ||
-                  (() => {
-                    // Build hidden inputs dynamically
-                    ids.forEach(id => {
-                      const inp = document.createElement("input")
-                      inp.type  = "hidden"
-                      inp.name  = "card_ids[]"
-                      inp.value = id
-                      form.appendChild(inp)
-                    })
-                  })()
-
     if (ids.length !== this.pickCount) return
 
+    const form = this.element.querySelector('form')
     this.submitBtnTarget.disabled = true
     this.submitBtnTarget.textContent = "Submitted!"
 
@@ -53,6 +41,11 @@ export default class extends Controller {
         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
       },
       body: JSON.stringify({ card_ids: ids })
+    }).then(response => {
+      if (!response.ok) {
+        this.submitBtnTarget.disabled = false
+        this.submitBtnTarget.textContent = "Submit"
+      }
     }).catch(() => {
       this.submitBtnTarget.disabled = false
       this.submitBtnTarget.textContent = "Submit"
