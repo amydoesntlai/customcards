@@ -7,7 +7,7 @@ export default class extends Controller {
     event.preventDefault()
     const code = this.codeTarget.value.trim().toUpperCase()
     if (code.length === 6) {
-      window.location.href = `/game_rooms/${code}/join`
+      window.location.href = `/game_rooms/${code}`
     }
   }
 }
