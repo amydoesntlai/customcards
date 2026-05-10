@@ -57,7 +57,7 @@ export default class extends Controller {
     const el = document.getElementById("player-status")
     if (!el || !data.players) return
     el.innerHTML = data.players.map(p =>
-      `<span class="player-badge ${p.online ? "online" : "offline"}">${p.username} <strong>${p.score}</strong></span>`
+      `<span class="player-badge ${p.online ? "online" : "offline"}">${p.username}</span>`
     ).join("")
 
     this.updateStartButton(data.players.length)
