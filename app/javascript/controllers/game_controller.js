@@ -10,6 +10,7 @@ export default class extends Controller {
   }
 
   toggleCard(event) {
+    if (this.submitted) return
     const el = event.currentTarget
     const id = el.dataset.cardId
 
@@ -36,8 +37,10 @@ export default class extends Controller {
     if (ids.length !== this.pickCount) return
 
     const form = this.element.querySelector('form')
+    this.submitted = true
     this.submitBtnTarget.disabled = true
     this.submitBtnTarget.textContent = "Submitted!"
+    this.cardTargets.forEach(c => c.style.pointerEvents = "none")
 
     fetch(form.action, {
       method: "POST",
@@ -48,12 +51,16 @@ export default class extends Controller {
       body: JSON.stringify({ card_ids: ids })
     }).then(response => {
       if (!response.ok) {
+        this.submitted = false
         this.submitBtnTarget.disabled = false
         this.submitBtnTarget.textContent = "Submit"
+        this.cardTargets.forEach(c => c.style.pointerEvents = "")
       }
     }).catch(() => {
+      this.submitted = false
       this.submitBtnTarget.disabled = false
       this.submitBtnTarget.textContent = "Submit"
+      this.cardTargets.forEach(c => c.style.pointerEvents = "")
     })
   }
 
