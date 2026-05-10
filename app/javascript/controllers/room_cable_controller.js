@@ -31,7 +31,11 @@ export default class extends Controller {
         this.updateSubmitProgress(data)
         break
       case "round_started":
-        this.updateRoundHeader(data)
+        if (!document.getElementById("prompt-area")) {
+          Turbo.visit(window.location.href)
+        } else {
+          this.updateRoundHeader(data)
+        }
         break
       case "judging_started":
         // Hand partial is broadcast via Turbo Stream directly to judge
@@ -41,6 +45,9 @@ export default class extends Controller {
         break
       case "game_over":
         this.showGameOver(data)
+        break
+      case "player_count_updated":
+        this.updateStartButton(data.count)
         break
       case "system_message":
         this.showBanner(data.message)
@@ -55,8 +62,12 @@ export default class extends Controller {
       `<span class="player-badge ${p.online ? "online" : "offline"}">${p.username} <strong>${p.score}</strong></span>`
     ).join("")
 
+    this.updateStartButton(data.players.length)
+  }
+
+  updateStartButton(count) {
     const startBtn = document.querySelector("#start-section button[type='submit']")
-    if (startBtn) startBtn.disabled = data.players.length < 3
+    if (startBtn) startBtn.disabled = count < 3
   }
 
   updateSubmitProgress(data) {

@@ -91,5 +91,10 @@ class GameRoomsController < ApplicationController
       target: "lobby-player-count",
       html: "#{room.active_players.count} player(s) in room"
     )
+
+    ActionCable.server.broadcast(room.broadcast_stream, {
+      type: "player_count_updated",
+      count: room.active_players.count
+    })
   end
 end
