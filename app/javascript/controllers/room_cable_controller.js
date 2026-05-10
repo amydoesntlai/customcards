@@ -31,7 +31,7 @@ export default class extends Controller {
         this.updateSubmitProgress(data)
         break
       case "round_started":
-        if (!document.getElementById("prompt-area")) {
+        if (document.getElementById("lobby-player-count")) {
           Turbo.visit(window.location.href)
         } else {
           this.updateRoundHeader(data)
