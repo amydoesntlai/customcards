@@ -10,6 +10,20 @@ class GameRoomChannel < ApplicationCable::Channel
 
     membership.mark_seen!
     broadcast_presence("online")
+
+    transmit({ type: "player_count_updated", count: @room.active_players.count })
+
+    if @room.playing? && (round = @room.active_round)
+      transmit({
+        type: "round_started",
+        number: round.number,
+        judge: round.judge.username,
+        prompt: round.prompt_card.content,
+        pick_count: round.prompt_card.pick_count,
+        submitted_count: round.submissions.count,
+        needed_count: round.non_judge_players.count
+      })
+    end
   end
 
   def unsubscribed
