@@ -34,6 +34,7 @@ class GameRoomChannel < ApplicationCable::Channel
 
     membership.update!(status: "disconnected", last_seen_at: Time.current)
     broadcast_presence("offline")
+    broadcast_room_update
 
     HandleDisconnectJob.set(wait: 45.seconds).perform_later(
       game_room_id: @room.id,
@@ -42,6 +43,21 @@ class GameRoomChannel < ApplicationCable::Channel
   end
 
   private
+
+  def broadcast_room_update
+    Turbo::StreamsChannel.broadcast_update_to(
+      @room.broadcast_stream,
+      target: "lobby-player-count",
+      html: "#{@room.active_players.count} player(s) in room"
+    )
+
+    Turbo::StreamsChannel.broadcast_update_to(
+      @room.broadcast_stream,
+      target: "scoreboard",
+      partial: "game_rooms/scoreboard",
+      locals: { room: @room }
+    )
+  end
 
   def broadcast_presence(state)
     ActionCable.server.broadcast(@room.broadcast_stream, {
