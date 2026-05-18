@@ -1,0 +1,10 @@
+<div class="start-section">
+  <% if room.active_players.count < 3 %>
+    <p class="hint">Need at least 3 players to start.</p>
+  <% end %>
+  <%= button_to "Start Game",
+        start_game_room_path(room.code),
+        method: :post,
+        class: "btn btn--primary btn--full",
+        disabled: room.active_players.count < 3 %>
+</div>

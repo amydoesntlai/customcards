@@ -57,6 +57,13 @@ class GameRoomChannel < ApplicationCable::Channel
       partial: "game_rooms/scoreboard",
       locals: { room: @room }
     )
+
+    Turbo::StreamsChannel.broadcast_update_to(
+      "room_owner:#{@room.id}",
+      target: "start-section",
+      partial: "game_rooms/start_section",
+      locals: { room: @room }
+    )
   end
 
   def broadcast_presence(state)

@@ -10,6 +10,9 @@
     <%= turbo_stream_from "player_hand:#{@my_grp.id}" %>
   <% end %>
   <%= turbo_stream_from @room.broadcast_stream %>
+  <% if @room.owner == current_user %>
+    <%= turbo_stream_from "room_owner:#{@room.id}" %>
+  <% end %>
 
   <div class="game-header">
     <div class="game-header__code">
@@ -41,16 +44,7 @@
 
       <div id="start-section">
         <% if @room.waiting? && @room.owner == current_user %>
-          <div class="start-section">
-            <% if @room.active_players.count < 3 %>
-              <p class="hint">Need at least 3 players to start.</p>
-            <% end %>
-            <%= button_to "Start Game",
-                  start_game_room_path(@room.code),
-                  method: :post,
-                  class: "btn btn--primary btn--full",
-                  disabled: @room.active_players.count < 3 %>
-          </div>
+          <%= render "game_rooms/start_section", room: @room %>
         <% elsif @room.waiting? %>
           <p class="hint">Waiting for <strong><%= @room.owner.username %></strong> to start...</p>
         <% end %>

@@ -61,6 +61,7 @@ class GameRoomsController < ApplicationController
     end
 
     StartRoundJob.perform_now(@room.id)
+    Turbo::StreamsChannel.broadcast_refresh_to(@room.broadcast_stream)
     redirect_to game_room_path(@room.code)
   end
 
@@ -92,9 +93,11 @@ class GameRoomsController < ApplicationController
       html: "#{room.active_players.count} player(s) in room"
     )
 
-    ActionCable.server.broadcast(room.broadcast_stream, {
-      type: "player_count_updated",
-      count: room.active_players.count
-    })
+    Turbo::StreamsChannel.broadcast_update_to(
+      "room_owner:#{room.id}",
+      target: "start-section",
+      partial: "game_rooms/start_section",
+      locals: { room: room }
+    )
   end
 end
